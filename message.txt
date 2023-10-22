@@ -1,0 +1,80 @@
+package data;
+import javax.swing.*;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+public class Data extends JFrame {
+    JLabel L1 = new JLabel("student number");
+     JLabel L2 = new JLabel("student name");
+      JLabel L3 = new JLabel("student Dept");
+       JLabel L4 = new JLabel("show");
+       JTextField T1 = new JTextField(25);
+       JTextField T2 = new JTextField(25);
+       JTextField T3 = new JTextField(25);
+       JTextArea Ta = new JTextArea(10,20);
+       JButton B1 = new JButton("Display Record");
+       JButton B2 = new JButton("Insert Record");
+       JButton B3 = new JButton("Delete Record");
+       JButton B4 = new JButton("Show data");
+       Connection c =null;
+       Statement st = null;
+       ResultSet rs = null;
+       String URL = "jdbc:derby://localhost:1527/school";
+       String user="a";
+       String pass="12345";
+    public Data(){
+        setLayout(new FlowLayout());
+        add(L1); add(T1);
+        add(L2); add(T2);
+        add(L3); add(T3);
+        add(L4); add(new JScrollPane(Ta));
+        add(B1); add(B2);add(B3); add(B4);
+        ac h = new ac();
+        B4.addActionListener(h);
+        
+    }
+    public void connect(){
+        if(c==null){
+            try {
+                c = DriverManager.getConnection(URL,user,pass);
+                st=c.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_UPDATABLE);
+                rs = st.executeQuery("select * from student");
+                JOptionPane.showMessageDialog(this,"Connect is successfull");
+            } catch (SQLException ex) {
+               JOptionPane.showMessageDialog(this,ex);
+            }
+        }
+    }
+    private class ac implements  ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+           if(e.getSource()==B4){
+               connect();
+               try {
+                   while(rs.next()){
+                   Ta.append("\n"+rs.getString(1)+" "+rs.getString(2)+" "+rs.getString(3));
+                   }
+               } catch (SQLException ex) {
+                   JOptionPane.showMessageDialog(null,ex);
+               }
+          }
+               
+        }
+        
+    }
+   
+    public static void main(String[] args) {
+        
+        Data d = new Data();
+        d.setVisible(true);
+        d.setSize(400,500);
+        d.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+    }
+    
+}
